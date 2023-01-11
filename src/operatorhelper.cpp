@@ -7,6 +7,7 @@
 #include <QtMath>
 
 #include "mygraphicsscene.h"
+#include "mygraphicsitem.h"
 
 static QColor randomColor()
 {
@@ -71,7 +72,7 @@ void DrawRectOperator::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent, MyG
     }
 
     scene->clearSelection();
-    m_rectItem = new QGraphicsRectItem(m_pressPos.x(), m_pressPos.y(), 1, 1);
+    m_rectItem = new QGraphicsRectItem();
     m_rectItem->setPos(m_pressPos);
     m_rectItem->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
     m_rectItem->setBrush(randomColor());
@@ -102,6 +103,17 @@ void DrawRectOperator::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent, M
     m_rectItem = nullptr;
 }
 
+QPolygonF adjustPolygon(const QPolygonF &p)
+{
+    auto br = p.boundingRect();
+    QPolygonF ret;
+    for (const auto &point : p) {
+        ret.append(point - br.topLeft());
+    }
+
+    return ret;
+}
+
 void DrawPolygonOperator::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent, MyGraphicsScene *scene)
 {
     OperatorBase::mouseMoveEvent(mouseEvent, scene);
@@ -112,7 +124,8 @@ void DrawPolygonOperator::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent, M
 
     QPolygonF p(m_polygonTemp);
     p += m_latestPos;
-    m_polygonItem->setPolygon(p);
+    m_polygonItem->setPos(p.boundingRect().topLeft());
+    m_polygonItem->setPolygon(adjustPolygon(p));
 }
 
 void DrawPolygonOperator::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent, MyGraphicsScene *scene)
@@ -129,7 +142,8 @@ void DrawPolygonOperator::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent, 
 
         if (!m_polygonTemp.isClosed() && m_polygonItem) {
             m_polygonTemp.append(m_polygonTemp.first());
-            m_polygonItem->setPolygon(m_polygonTemp);
+            m_polygonItem->setPos(m_polygonTemp.boundingRect().topLeft());
+            m_polygonItem->setPolygon(adjustPolygon(m_polygonTemp));
         }
 
         m_polygonItem = nullptr;
@@ -145,11 +159,13 @@ void DrawPolygonOperator::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent, 
         m_polygonItem = new QGraphicsPolygonItem;
         m_polygonItem->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
         m_polygonItem->setBrush(randomColor());
+        m_polygonItem->setPos(m_pressPos);
         scene->addItem(m_polygonItem);
         m_polygonTemp.append(m_pressPos);
     } else {
         m_polygonTemp += m_pressPos;
-        m_polygonItem->setPolygon(m_polygonTemp);
+        m_polygonItem->setPos(m_polygonTemp.boundingRect().topLeft());
+        m_polygonItem->setPolygon(adjustPolygon(m_polygonTemp));
     }
 }
 

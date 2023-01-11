@@ -3,26 +3,12 @@
 
 #include <QGraphicsItem>
 
-class MyGraphicsItem : public QGraphicsItem
+class MyGraphicsRectItem : public QGraphicsRectItem
 {
 public:
-    MyGraphicsItem();
-
-    bool operatorToolsVisible() const;
-    void setOperatorToolsVisible(bool newOperatorToolsVisible);
-
-private:
-    bool m_operatorToolsVisible { false };
-};
-
-class MyGraphicsRectItem : public MyGraphicsItem
-{
-public:
-    QRectF boundingRect() const override;
+    MyGraphicsRectItem() = default;
+    ~MyGraphicsRectItem() = default;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-
-private:
-    QRectF m_rectContent;
 };
 
 #endif // MYGRAPHICSITEM_H

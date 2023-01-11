@@ -1,22 +1,8 @@
 ﻿#include "mygraphicsitem.h"
 
-MyGraphicsItem::MyGraphicsItem()
+void MyGraphicsRectItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    qDebug() << rect() << pos();
 
-}
-
-bool MyGraphicsItem::operatorToolsVisible() const
-{
-    return m_operatorToolsVisible;
-}
-
-void MyGraphicsItem::setOperatorToolsVisible(bool newOperatorToolsVisible)
-{
-    m_operatorToolsVisible = newOperatorToolsVisible;
-    update();
-}
-
-QRectF MyGraphicsRectItem::boundingRect() const
-{
-    return QRectF();
+    QGraphicsRectItem::paint(painter, option, widget);
 }
